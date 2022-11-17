@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UserService.Contract\UserService.Contract.csproj"/>
+    <ProjectReference Include="..\UserService.Dao\UserService.Dao.csproj"/>
+    <ProjectReference Include="..\UserService.Misc\UserService.Misc.csproj"/>
+    <ProjectReference Include="..\UserService.Model\UserService.Model.csproj"/>
+  </ItemGroup>
+
+</Project>
