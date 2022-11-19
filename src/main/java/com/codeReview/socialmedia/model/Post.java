@@ -7,7 +7,7 @@ import javax.persistence.*;
 public class Post {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -36,7 +36,7 @@ public class Post {
     }
 
     public String getPost() {
-        return content;
+        return post;
     }
 
     public void setPost(String post) {

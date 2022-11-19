@@ -7,9 +7,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-/*@Repository
+@Repository
 public interface PostRepository extends JpaRepository<Post,Integer> {
 
-}*/
+}
 
-public interface PostRepository{}
+//public interface PostRepository{}
