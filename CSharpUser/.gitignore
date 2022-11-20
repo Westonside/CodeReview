@@ -1,0 +1,16 @@
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+[Bb]in/
+[Oo]bj/
+../target/
+
+.vs/
+.idea/
+.vscode/
+
+*.DotSettings.user
+launchSettings.json
+appsettings.Development.json
