@@ -5,6 +5,7 @@
 [Rr]eleases/
 [Bb]in/
 [Oo]bj/
+target/
 
 .vs/
 .idea/
