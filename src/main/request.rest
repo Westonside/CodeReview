@@ -1,8 +1,15 @@
-POST https:://localhost:8080/api/product
+POST http://localhost:8080/api/posts/create
 Content-Type: application/json
 
 {
-    "pid" : 1
-    "uid": 123
-    "content": "first post"
+    "uid": 415,
+    "content": "get dog"
 }
+
+
+###
+GET http://localhost:8080/api/posts/all
+
+###
+GET http://localhost:8080/api/posts/415
+

@@ -13,7 +13,6 @@ import javax.persistence.Id;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostResponse {
-    private String pID;
     private String uID;
     private String content;
 }

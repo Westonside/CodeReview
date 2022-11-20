@@ -22,8 +22,7 @@ public class PostService {
 
     public void createPost(PostRequest postRequest) {
         Post post = Post.builder()
-                .pID(postRequest.getPostID())
-                .uID(postRequest.getPostID())
+                .uID(postRequest.getUID())
                 .content(postRequest.getContent())
                 .build();
 
@@ -34,11 +33,18 @@ public class PostService {
 
     public List<PostResponse> getAllPosts() {
         return postRepo.findAll().stream().map(post -> PostResponse.builder()
-                .pID(post.getPID())
                 .uID(post.getUID())
                 .content(post.getContent())
                 .build()).toList();
     }
 
+
+    public List<PostResponse> getByUser(String userID){
+        List<Post> a = postRepo.findAll().stream().filter(post -> post.getUID().equals(userID)).toList();
+       return a.stream().map(post -> PostResponse.builder()
+                .uID(post.getUID())
+                .content(post.getContent())
+                .build()).toList();
+    }
 
 }
