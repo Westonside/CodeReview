@@ -1,0 +1,8 @@
+POST https:://localhost:8080/api/product
+Content-Type: application/json
+
+{
+    "pid" : 1
+    "uid": 123
+    "content": "first post"
+}

@@ -5,18 +5,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.web.bind.annotation.RestController;
 
 import javax.persistence.Id;
 
-@Document(value = "post")
+
+@Document(value = "User")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Data
-public class Post {
+public class User {
+
     @Id
-    private String pID;
-    private String uID;
-    private String content;
+    private int UID;
 }
