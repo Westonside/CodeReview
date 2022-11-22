@@ -31,7 +31,7 @@ impl MongoConnectionParams<'_> {
 const MONGO_PARAMS: MongoConnectionParams<'static> = MongoConnectionParams {
     username: "cr",
     password: "cr",
-    host: "palain",
+    host: "localhost",
     port: 24099,
     database: "cr",
 };
@@ -145,7 +145,7 @@ async fn list_from(param: web::Path<(String, String)>, data: web::Data<AppData>)
 #[post("/api/messages/create/")]
 async fn create(request: web::Json<MessageRequest>, data: web::Data<AppData>) -> HttpResponse {
     let Some(message) = request.to_message() else {
-        return HttpResponse::InternalServerError().finish();
+        return HttpResponse::BadRequest().finish();
     };
     let result = data.messages.insert_one(message, None).await;
     match result {
