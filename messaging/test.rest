@@ -8,4 +8,4 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:22838/api/messages/user1
+GET http://localhost:22838/api/messages/user1/user2
