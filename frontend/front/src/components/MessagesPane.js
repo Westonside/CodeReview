@@ -235,7 +235,7 @@ function Message(props) {
                     {them}
                 </Typography>
                 <Typography display="inline" variant="h3">
-                    {props.user === props.from ? "You: " : them + ": "}
+                    {props.user === props.from ? them + ": " : "You: "}
                 </Typography>
                 <Typography display="inline" variant="h2">
                     {props.message}
