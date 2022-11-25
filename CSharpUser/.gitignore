@@ -11,6 +11,6 @@
 .idea/
 .vscode/
 
-*.DotSettings.user
+*.DotSettings.USER
 launchSettings.json
 appsettings.Development.json

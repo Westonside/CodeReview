@@ -8,7 +8,7 @@ use actix_web::middleware::Logger;
 use mongodb::{Client, Collection, Database};
 use mongodb::bson::{DateTime, doc, Document};
 use mongodb::bson::oid::ObjectId;
-use mongodb::options::{ClientOptions, FindOptions};
+use mongodb::options::{ClientOptions};
 use futures::stream::{StreamExt};
 use serde::Serialize;
 
@@ -112,6 +112,16 @@ impl Message {
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
+pub struct MessageStringDate {
+    #[serde(skip_serializing)]
+    pub _id: Option<ObjectId>,
+    pub time: String,
+    pub message: String,
+    pub from: String,
+    pub to: String,
+}
+
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct MessageRequest {
     pub message: Option<String>,
     pub from: Option<String>,
@@ -125,25 +135,6 @@ impl MessageRequest {
             _ => None,
         }
     }
-}
-
-/// list 50 last tweets `/tweets`
-#[get("/api/messages/{user}")]
-async fn list(param: web::Path<(String, )>, data: web::Data<AppData>) -> HttpResponse {
-    println!("/api/messages/user: {}", param.0);
-    let filter = doc! {"$or": [{"to": &param.0}, {"from": &param.0}]};
-    let find_options: FindOptions = FindOptions::builder().sort(doc! {"time": -1}).build();
-
-    send_response(filter, find_options, &data.messages).await
-}
-
-#[get("/api/messages/{user1}/{user2}")]
-async fn list_from(param: web::Path<(String, String)>, data: web::Data<AppData>) -> HttpResponse {
-    println!("/api/messages/user1/user2: {}, {}", param.0, param.1);
-    let filter: Document = doc! {"$or": [{"from": &param.0, "to": &param.1}, {"from": &param.1, "to": &param.0}]};
-    let find_options: FindOptions = FindOptions::builder().sort(doc! {"time": -1}).build();
-
-    send_response(filter, find_options, &data.messages).await
 }
 
 #[post("/api/messages/create/")]
@@ -165,6 +156,170 @@ async fn create(request: web::Json<MessageRequest>, data: web::Data<AppData>) ->
             HttpResponse::InternalServerError().json(JsonResponse::failure("Unable to write to database"))
         }
     }
+}
+
+/// list 50 last tweets `/tweets`
+#[get("/api/messages/{USER}")]
+async fn list(param: web::Path<(String, )>, data: web::Data<AppData>) -> HttpResponse {
+    let user: &String = &param.0;
+    println!("/api/messages/USER: {}", user);
+    let aggregation: Vec<Document> = vec![
+        doc! {
+            "$match": doc! {
+                "$or": [
+                    doc! {
+                        "from": user
+                    },
+                    doc! {
+                        "to": user
+                    }
+                ]
+            }
+        },
+        doc! {
+            "$sort": doc! {
+                "time": -1
+            }
+        },
+        doc! {
+            "$addFields": doc! {
+                "contents": [
+                    doc! {
+                        "from": "$from",
+                        "to": "$to",
+                        "time": "$time",
+                        "message": "$message",
+                        "_id": "$_id"
+                    },
+                    doc! {
+                        "from": "$to",
+                        "to": "$from",
+                        "time": "$time",
+                        "message": "$message",
+                        "_id": "$_id"
+                    }
+                ]
+            }
+        },
+        doc! {
+            "$project": doc! {
+                "_id": 0,
+                "contents": 1
+            }
+        },
+        doc! {
+            "$unwind": "$contents"
+        },
+        doc! {
+            "$group": doc! {
+                "_id": [
+                    "$contents.from",
+                    "contents.$to"
+                ],
+                "message": doc! {
+                    "$first": "$contents.message"
+                },
+                "time": doc! {
+                    "$first": "$contents.time"
+                },
+                "from": doc! {
+                    "$first": "$contents.from"
+                },
+                "to": doc! {
+                    "$first": "$contents.to"
+                },
+                "id": doc! {
+                    "$first": "$contents._id"
+                }
+            }
+        },
+        doc! {
+            "$project": doc! {
+                "_id": 0
+            }
+        },
+        doc! {
+            "$group": doc! {
+                "_id": "$id",
+                "message": doc! {
+                    "$first": "$message"
+                },
+                "time": doc! {
+                    "$first": "$time"
+                },
+                "from": doc! {
+                    "$first": "$from"
+                },
+                "to": doc! {
+                    "$first": "$to"
+                }
+            }
+        },
+        doc! {
+            "$sort": doc! {
+                "time": -1
+            }
+        },
+        doc! {
+            "$project": doc! {
+                "time": doc! {
+                    "$dateToString": doc! {
+                        "date": "$time"
+                    }
+                },
+                "message": 1,
+                "from": 1,
+                "to": 1
+            }
+        }
+    ];
+
+    send_response(aggregation, &data.messages).await
+}
+
+#[get("/api/messages/{USER1}/{USER2}")]
+async fn list_from(param: web::Path<(String, String)>, data: web::Data<AppData>) -> HttpResponse {
+    let user1: &String = &param.0;
+    let user2: &String = &param.1;
+
+    println!("/api/messages/USER1/USER2: {}, {}", user1, user2);
+
+    let aggregation: Vec<Document> =
+        vec![
+            doc! {
+                "$match": doc! {
+                    "$or": [
+                        doc! {
+                            "from": user1,
+                            "to": user2
+                        },
+                        doc! {
+                            "from": user2,
+                            "to": user1
+                        }
+                    ]
+                }
+            },
+            doc! {
+                "$sort": doc! {
+                    "time": -1
+                }
+            },
+            doc! {
+                "$project": doc! {
+                    "time": doc! {
+                        "$dateToString": doc! {
+                            "date": "$time"
+                        }
+                    },
+                    "message": 1,
+                    "from": 1,
+                    "to": 1
+                }
+            }
+        ];
+
+    send_response(aggregation, &data.messages).await
 }
 
 #[derive(Debug, Serialize)]
@@ -191,16 +346,23 @@ impl JsonResponse<String> {
     }
 }
 
-async fn send_response(filter: Document, find_options: FindOptions, messages: &Collection<Message>) -> HttpResponse {
-    match messages.find(filter, find_options).await {
+async fn send_response(aggregation: Vec<Document>, messages: &Collection<Message>) -> HttpResponse {
+    match messages.aggregate(aggregation, None).await {
         Ok(mut cursor) => {
             println!(" > found");
-            let mut messages: Vec<Message> = vec!();
+            let mut messages: Vec<MessageStringDate> = vec!();
 
-            while let Some(message) = cursor.next().await {
-                match message {
-                    Ok(e) => {
-                        messages.push(e)
+            while let Some(result) = cursor.next().await {
+                match result {
+                    Ok(document) => {
+                        match mongodb::bson::from_document(document.clone()) {
+                            Ok(message) => {
+                                messages.push(message)
+                            }
+                            Err(e) => {
+                                println!("Error parsing bson to result: {:?} -> {:?}", document, e)
+                            }
+                        }
                     }
                     Err(_) => {}
                 }

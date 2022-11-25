@@ -2,10 +2,12 @@ POST http://localhost:22838/api/messages/create
 Content-Type: application/json
 
 {
-  "from": "abc",
-  "to": "def",
-  "message": "Hello, World!"
+  "from": "user1",
+  "to": "user3",
+  "message": "Hello user3!"
 }
+###
+GET http://localhost:22838/api/messages/user1
 
 ###
-GET http://localhost:22838/api/messages/user1/user2
+GET http://localhost:22838/api/messages/user1/user3
