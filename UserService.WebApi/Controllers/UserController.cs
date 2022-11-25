@@ -74,6 +74,10 @@ public class UserController : ControllerBase
 
         if (appCode != AppCode.SUCCESS)
         {
+            if (appCode == AppCode.ERR_3022_DB_INFO_DUPLICATED)
+            {
+                return MyResult.Invalid(statusCode:400, code: 400, msg: "user record already exists");
+            }
             return MyResult.Error(500, msg: "cannot create user");
         }
 
