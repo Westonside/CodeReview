@@ -70,6 +70,7 @@ export function HomePage() {
     const userChange = (e) => {
         const newUser = e.target.innerText;
         setUser(newUser);
+        window.location.reload();
         window.localStorage.setItem("user", newUser);
     }
 

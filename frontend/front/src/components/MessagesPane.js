@@ -1,11 +1,11 @@
 import React from "react";
 import {
-    Alert, Autocomplete,
+    Alert, Autocomplete, Box,
     Button, Card, CardContent, CircularProgress,
     Dialog, DialogActions,
     DialogContent,
     DialogContentText,
-    DialogTitle,
+    DialogTitle, Stack,
     TextareaAutosize, TextField,
     Typography
 } from "@mui/material";
@@ -234,16 +234,47 @@ function Message(props) {
                 <Typography color="text.secondary" variant="h4">
                     {them}
                 </Typography>
-                <Typography display="inline" variant="h3">
-                    {props.user === props.from ? them + ": " : "You: "}
-                </Typography>
-                <Typography display="inline" variant="h2">
-                    {props.message}
-                </Typography>
+                <Stack direction={"row"} spacing={4} justifyContent={"space-between"}>
+                    <Typography display="inline" variant="h2" align={"center"}>
+                        {props.message}
+                    </Typography>
+                    <Typography color="text.secondary" variant="h6" align="right">
+                        {formatTime(new Date(props.time))}
+                    </Typography>
+                </Stack>
             </CardContent>
         </Card>
     );
 }
+
+//Begin copied code https://stackoverflow.com/questions/47253206/convert-milliseconds-to-timestamp-time-ago-59m-5d-3m-etc-in-javascript, 25/11/2022
+const periods = {
+    month: 30 * 24 * 60 * 60 * 1000,
+    week: 7 * 24 * 60 * 60 * 1000,
+    day: 24 * 60 * 60 * 1000,
+    hour: 60 * 60 * 1000,
+    minute: 60 * 1000
+};
+
+function formatTime(timeCreated) {
+    const diff = Date.now() - timeCreated;
+
+    if (diff > periods.month) {
+        // it was at least a month ago
+        return Math.floor(diff / periods.month) + "m";
+    } else if (diff > periods.week) {
+        return Math.floor(diff / periods.week) + "w";
+    } else if (diff > periods.day) {
+        return Math.floor(diff / periods.day) + "d";
+    } else if (diff > periods.hour) {
+        return Math.floor(diff / periods.hour) + "h";
+    } else if (diff > periods.minute) {
+        return Math.floor(diff / periods.minute) + "m";
+    }
+    return "Just now";
+}
+
+//End copied code
 
 function MessageRow(props) {
     let them;
