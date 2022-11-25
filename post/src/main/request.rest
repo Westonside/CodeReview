@@ -1,0 +1,15 @@
+POST http://localhost:8080/api/posts/create
+Content-Type: application/json
+
+{
+    "uid": "ejs35",
+    "content": "Hello everyone"
+}
+
+
+###
+GET http://localhost:8080/api/posts/all
+
+###
+GET http://localhost:8080/api/posts/415
+
