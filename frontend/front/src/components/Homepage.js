@@ -59,7 +59,11 @@ export function HomePage() {
                 } else {
                     response.json().then(data => {
                         if(data.hasErr) {
-                            setValidation(data.data.errors[0]);
+                            if(data.data.errors) {
+                                setValidation(data.data.errors[0]);
+                            } else {
+                                setValidation(data.msg);
+                            }
                             setUserCreated("none");
                         }
                     })
